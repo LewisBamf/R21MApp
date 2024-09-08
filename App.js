@@ -42,6 +42,8 @@ export default function App() {
     [toggleTheme, isThemeDark]
   );
 
+  console.log('Current Theme Colors:', theme.colors);
+
   return (
     <PreferencesContext.Provider value={preferences}>
       <PaperProvider theme={theme}>
@@ -49,8 +51,11 @@ export default function App() {
           <Tab.Navigator
             screenOptions={({ route }) => ({
               tabBarIcon: () => <TabBarIcon routeName={route.name} />,
-              tabBarActiveTintColor: theme.colors.primary,
-              tabBarInactiveTintColor: 'gray',
+              tabBarActiveTintColor: theme.colors.primary, // Set to green
+              tabBarInactiveTintColor: theme.colors.placeholder, // Use placeholder color for inactive
+              tabBarStyle: {
+                backgroundColor: theme.colors.background, // Ensure background color is applied
+              },
             })}
           >
             <Tab.Screen name="Dashboard" component={DashboardScreen} />
