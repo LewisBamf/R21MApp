@@ -1,21 +1,22 @@
-// App.js
 import React, { useState, useMemo, useCallback } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Provider as PaperProvider, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-import { CombinedDefaultTheme, CombinedDarkTheme } from './src/theme';
+import { simpleMoneyLightTheme, simpleMoneyDarkTheme } from './src/theme';
 import { PreferencesContext } from './src/context/PreferencesContext';
 import DashboardScreen from './src/screens/DashboardScreen';
 import TutorialsScreen from './src/screens/TutorialsScreen';
 
+// App.js
+
+
 const Tab = createBottomTabNavigator();
 
-function TabBarIcon({ routeName }) {
+function TabBarIcon({ routeName, focused }) {
   const { colors } = useTheme();
   let iconName;
-  const iconColor = colors.primary; // Access primary color from the theme
+  const iconColor = focused ? colors.primary : colors.placeholder;
 
   if (routeName === 'Dashboard') {
     iconName = 'view-dashboard-outline';
@@ -28,7 +29,7 @@ function TabBarIcon({ routeName }) {
 
 export default function App() {
   const [isThemeDark, setIsThemeDark] = useState(false);
-  const theme = isThemeDark ? CombinedDarkTheme : CombinedDefaultTheme;
+  const theme = isThemeDark ? simpleMoneyDarkTheme : simpleMoneyLightTheme;
 
   const toggleTheme = useCallback(() => {
     setIsThemeDark((prevTheme) => !prevTheme);
@@ -42,19 +43,19 @@ export default function App() {
     [toggleTheme, isThemeDark]
   );
 
-  console.log('Current Theme Colors:', theme.colors);
-
   return (
-    <PreferencesContext.Provider value={preferences}>
+    <PreferencesContext.Provider value={preferences} theme={theme}>
       <PaperProvider theme={theme}>
         <NavigationContainer theme={theme}>
           <Tab.Navigator
             screenOptions={({ route }) => ({
-              tabBarIcon: () => <TabBarIcon routeName={route.name} />,
-              tabBarActiveTintColor: theme.colors.primary, // Set to green
-              tabBarInactiveTintColor: theme.colors.placeholder, // Use placeholder color for inactive
+              tabBarIcon: ({ focused }) => (
+                <TabBarIcon routeName={route.name} focused={focused} />
+              ),
+              tabBarActiveTintColor: theme.colors.primary,
+              tabBarInactiveTintColor: theme.colors.placeholder,
               tabBarStyle: {
-                backgroundColor: theme.colors.background, // Ensure background color is applied
+                backgroundColor: theme.colors.background,
               },
             })}
           >
