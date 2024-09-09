@@ -3,6 +3,7 @@ import { View, StyleSheet, ScrollView, Dimensions, Alert, Modal, TextInput, Touc
 import { useTheme, Text, Card, Divider, IconButton, Button } from 'react-native-paper';
 import { LineChart } from 'react-native-chart-kit';
 import { Line, Svg } from 'react-native-svg';
+import moment from 'moment';
 
 const DashboardScreen = () => {
   const { colors } = useTheme();
@@ -10,17 +11,26 @@ const DashboardScreen = () => {
 
   const [balance, setBalance] = useState(78839);
   const [goal, setGoal] = useState(1000000);
-  const [expenses, setExpenses] = useState([]);
+  const [expenses, setExpenses] = useState([
+    { amount: 50, type: 'expense', reference: 'Groceries', date: '2024-01-01' },
+    { amount: 120, type: 'expense', reference: 'Utilities', date: '2024-01-15' },
+    { amount: 200, type: 'income', reference: 'Salary', date: '2024-02-01' }
+  ]);
   const [modalVisible, setModalVisible] = useState(false);
   const [amount, setAmount] = useState('');
-  const [expenseType, setExpenseType] = useState('expense'); // default to 'expense'
+  const [expenseType, setExpenseType] = useState('expense');
   const [reference, setReference] = useState('');
 
+  const transactions = expenses.map(expense => ({
+    ...expense,
+    date: moment(expense.date).format('MMM DD')
+  }));
+
   const data = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    labels: transactions.map(tx => tx.date),
     datasets: [
       {
-        data: [20, 45, 28, 80, 99, 43],
+        data: transactions.map(tx => tx.type === 'expense' ? -tx.amount : tx.amount),
         color: (opacity = 1) => colors.primary,
         strokeWidth: 2,
       },
@@ -54,16 +64,16 @@ const DashboardScreen = () => {
     const transactionAmount = parseFloat(amount);
     const updatedBalance = expenseType === 'expense' ? balance - transactionAmount : balance + transactionAmount;
 
-    setExpenses([...expenses, { amount: transactionAmount, type: expenseType, reference }]);
+    setExpenses([...expenses, { amount: transactionAmount, type: expenseType, reference, date: moment().format('YYYY-MM-DD') }]);
     setBalance(updatedBalance);
     setAmount('');
     setReference('');
     setModalVisible(false);
   };
 
-  const goalY = goal / (Math.max(...data.datasets[0].data, goal)) * 100;
-  const maxDataValue = Math.max(...data.datasets[0].data, goal);
-  const yAxisInterval = Math.ceil(maxDataValue / 5);
+  // Calculate the Y-axis range dynamically
+  const maxDataValue = Math.max(goal, ...data.datasets[0].data);
+  const yAxisStep = Math.ceil(maxDataValue / 4);
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -92,7 +102,7 @@ const DashboardScreen = () => {
             width={screenWidth - 32}
             height={240}
             yAxisLabel="£"
-            yAxisInterval={yAxisInterval} // Update Y-axis interval
+            yAxisInterval={1}
             chartConfig={{
               backgroundColor: colors.background,
               backgroundGradientFrom: colors.background,
@@ -111,9 +121,9 @@ const DashboardScreen = () => {
           <Svg height="240" width={screenWidth - 32} style={StyleSheet.absoluteFillObject}>
             <Line
               x1="0"
-              y1={240 - (goalY / 100) * 240}
+              y1={240 - (goal / maxDataValue) * 240}
               x2={screenWidth - 32}
-              y2={240 - (goalY / 100) * 240}
+              y2={240 - (goal / maxDataValue) * 240}
               stroke="grey"
               strokeWidth="2"
               strokeDasharray="5, 5"
@@ -133,7 +143,8 @@ const DashboardScreen = () => {
 
       <Divider style={styles.divider} />
 
-      <View style={styles.categories}>
+      <View style={styles.categoriesAndExpenses}>
+        {/* Static Category Cards */}
         <Card style={styles.categoryCard}>
           <Card.Content>
             <Text style={styles.categoryLabel}>Cash</Text>
@@ -158,22 +169,23 @@ const DashboardScreen = () => {
             <Text style={[styles.categoryValue, { color: colors.primary }]}>$102,225</Text>
           </Card.Content>
         </Card>
-      </View>
 
-      <View style={styles.expenseList}>
+        {/* Dynamic Expense List */}
         {expenses.map((expense, index) => (
-          <View key={index} style={styles.categoryCard}>
+          <Card key={index} style={styles.categoryCard}>
             <Card.Content>
               <Text style={styles.categoryLabel}>{expense.reference || 'No Reference'}</Text>
               <Text style={[styles.categoryValue, { color: expense.type === 'expense' ? colors.error : colors.primary }]}>
                 {`${expense.type === 'expense' ? '-' : '+'} $${expense.amount.toFixed(2)}`}
               </Text>
+              <Text style={[styles.categoryValue, { color: colors.onSurface }]}>
+                {moment(expense.date).format('MMM DD, YYYY')}
+              </Text>
             </Card.Content>
-          </View>
+          </Card>
         ))}
       </View>
 
-      {/* Modal for adding transactions */}
       <Modal
         transparent={true}
         animationType="slide"
@@ -224,73 +236,66 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   headerContent: {
-    flexDirection: 'column',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   creditScore: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   scoreValue: {
-    fontSize: 28,
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginLeft: 8,
   },
   notificationIcon: {
     marginRight: 8,
   },
   balanceSection: {
-    alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 24,
   },
   balance: {
     fontSize: 36,
     fontWeight: 'bold',
   },
   subtitle: {
-    fontSize: 14,
-    marginBottom: 8,
+    fontSize: 16,
+    marginTop: 4,
   },
   graphPlaceholder: {
-    height: 240,
-    width: '100%',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderRadius: 16,
+    padding: 8,
+    overflow: 'hidden',
   },
   chart: {
+    marginVertical: 8,
     borderRadius: 16,
   },
   actionButtons: {
-    marginVertical: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
   },
   button: {
-    marginVertical: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 4,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    textAlign: 'center',
+    flex: 1,
+    marginHorizontal: 8,
   },
   divider: {
     marginVertical: 16,
   },
-  categories: {
-    flexDirection: 'column',
+  categoriesAndExpenses: {
+    marginTop: 16,
   },
   categoryCard: {
-    marginVertical: 8,
+    marginBottom: 8,
+    borderRadius: 8,
   },
   categoryLabel: {
     fontSize: 16,
+    fontWeight: 'bold',
   },
   categoryValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 4,
-  },
-  expenseList: {
-    marginVertical: 16,
+    fontSize: 18,
   },
   modalContainer: {
     flex: 1,
@@ -299,27 +304,31 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContent: {
-    width: '80%',
+    backgroundColor: 'white',
     padding: 20,
-    backgroundColor: '#fff',
     borderRadius: 10,
-    elevation: 5,
+    width: '80%',
+    maxWidth: 400,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   input: {
     height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
+    borderColor: 'gray',
+    borderBottomWidth: 1,
+    marginBottom: 12,
+    paddingHorizontal: 8,
   },
   buttonGroup: {
-    marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
+  buttonText: {
+    color: 'white',
   },
 });
 
