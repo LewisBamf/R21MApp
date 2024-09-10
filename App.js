@@ -1,3 +1,4 @@
+// App.js
 import React, { useState, useMemo, useCallback } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -7,9 +8,7 @@ import { simpleMoneyLightTheme, simpleMoneyDarkTheme } from './src/theme';
 import { PreferencesContext } from './src/context/PreferencesContext';
 import DashboardScreen from './src/screens/DashboardScreen';
 import TutorialsScreen from './src/screens/TutorialsScreen';
-
-// App.js
-
+import Header from './src/components/Header';
 
 const Tab = createBottomTabNavigator();
 
@@ -43,12 +42,26 @@ export default function App() {
     [toggleTheme, isThemeDark]
   );
 
+  const handleMenuPress = () => {
+    // Handle menu button press (e.g., open drawer or show modal)
+    console.log('Menu button pressed');
+  };
+
+  const handleProfilePress = () => {
+    // Handle profile button press (e.g., navigate to profile screen)
+    console.log('Profile button pressed');
+  };
+
   return (
     <PreferencesContext.Provider value={preferences} theme={theme}>
       <PaperProvider theme={theme}>
         <NavigationContainer theme={theme}>
+          {/* Add the Header component */}
+          <Header onMenuPress={handleMenuPress} onProfilePress={handleProfilePress} />
+
           <Tab.Navigator
             screenOptions={({ route }) => ({
+              headerShown: false,
               tabBarIcon: ({ focused }) => (
                 <TabBarIcon routeName={route.name} focused={focused} />
               ),

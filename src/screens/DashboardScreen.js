@@ -87,31 +87,6 @@ const DashboardScreen = () => {
       <Divider style={styles.divider} />
 
       <View style={styles.categoriesAndExpenses}>
-        {/* Static Category Cards */}
-        <Card style={styles.categoryCard}>
-          <Card.Content>
-            <Text style={styles.categoryLabel}>Cash</Text>
-            <Text style={[styles.categoryValue, { color: colors.primary }]}>$5,732</Text>
-          </Card.Content>
-        </Card>
-        <Card style={styles.categoryCard}>
-          <Card.Content>
-            <Text style={styles.categoryLabel}>Credit Cards</Text>
-            <Text style={[styles.categoryValue, { color: colors.error }]}>- $4,388</Text>
-          </Card.Content>
-        </Card>
-        <Card style={styles.categoryCard}>
-          <Card.Content>
-            <Text style={styles.categoryLabel}>Investments</Text>
-            <Text style={[styles.categoryValue, { color: colors.primary }]}>$82,389</Text>
-          </Card.Content>
-        </Card>
-        <Card style={styles.categoryCard}>
-          <Card.Content>
-            <Text style={styles.categoryLabel}>Property</Text>
-            <Text style={[styles.categoryValue, { color: colors.primary }]}>$102,225</Text>
-          </Card.Content>
-        </Card>
 
         {/* Dynamic Expense List */}
         {expenses.map((expense, index) => (
@@ -155,7 +130,7 @@ const DashboardScreen = () => {
             <TouchableOpacity
                 style={[
                   styles.typeButton,
-                  expenseType === 'expense' && { backgroundColor: colors.accent },
+                  expenseType === 'expense' && { backgroundColor: colors.primary },
                 ]}
                 onPress={() => setExpenseType('expense')}
               >
@@ -172,7 +147,7 @@ const DashboardScreen = () => {
               </TouchableOpacity>
             </View>
             <Button mode="contained" onPress={handleTrackTransaction} style={{ marginTop: 10 }}>OK</Button>
-            <Button mode="contained" onPress={() => setModalVisible(false)} style={{ marginTop: 10 }}>Cancel</Button>
+            <Button mode="contained" onPress={() => setModalVisible(false)} style={{ marginTop: 10, backgroundColor: colors.error }}>Cancel</Button>
           </View>
         </View>
       </Modal>
