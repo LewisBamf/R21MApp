@@ -7,13 +7,14 @@ export const simpleMoneyLightTheme = {
     ...MD3LightTheme,
     colors: {
         ...MD3LightTheme.colors,
-        primary: 'rgb(76, 175, 80)',
-        accent: 'rgb(255, 193, 7)',
-        background: 'rgb(245, 245, 245)',
+        primary: 'rgb(68, 160, 111)',
+        secondary: 'rgb(140, 199, 171)',
+        accent: 'rgb(230, 216, 185)',
+        background: 'rgb(251, 251, 251)',
         surface: 'rgb(255, 255, 255)',
-        text: 'rgb(0, 0, 0)',
+        text: 'rgb(61, 71, 80)',
         placeholder: 'rgb(176, 176, 176)',
-        backdrop: 'rgb(0, 0, 0, 0.5)',
+        backdrop: 'rgb(23, 26, 31)',
         notification: 'rgb(255, 87, 34)',
     },
 };
@@ -23,6 +24,7 @@ export const simpleMoneyDarkTheme = {
     colors: {
         ...MD3DarkTheme.colors,
         primary: 'rgb(76, 175, 80)',
+        secondary: 'rgb(33, 150, 243)',
         accent: 'rgb(255, 193, 7)',
         background: 'rgb(18, 18, 18)',
         surface: 'rgb(30, 30, 30)',

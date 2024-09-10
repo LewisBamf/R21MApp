@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Dimensions, Alert, Modal, TextInput, TouchableOpacity } from 'react-native';
-import { useTheme, Text, Card, Divider, IconButton, Button } from 'react-native-paper';
-import { LineChart } from 'react-native-chart-kit';
-import { Line, Svg } from 'react-native-svg';
+import { useTheme, Text, Card, Divider, IconButton, Button, ProgressBar } from 'react-native-paper';
 import moment from 'moment';
+
+
 
 const DashboardScreen = () => {
   const { colors } = useTheme();
-  const screenWidth = Dimensions.get('window').width;
+
+  const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
 
   const [balance, setBalance] = useState(78839);
   const [goal, setGoal] = useState(1000000);
@@ -20,22 +22,6 @@ const DashboardScreen = () => {
   const [amount, setAmount] = useState('');
   const [expenseType, setExpenseType] = useState('expense');
   const [reference, setReference] = useState('');
-
-  const transactions = expenses.map(expense => ({
-    ...expense,
-    date: moment(expense.date).format('MMM DD')
-  }));
-
-  const data = {
-    labels: transactions.map(tx => tx.date),
-    datasets: [
-      {
-        data: transactions.map(tx => tx.type === 'expense' ? -tx.amount : tx.amount),
-        color: (opacity = 1) => colors.primary,
-        strokeWidth: 2,
-      },
-    ],
-  };
 
   const handleAddGoal = () => {
     Alert.prompt(
@@ -71,17 +57,13 @@ const DashboardScreen = () => {
     setModalVisible(false);
   };
 
-  // Calculate the Y-axis range dynamically
-  const maxDataValue = Math.max(goal, ...data.datasets[0].data);
-  const yAxisStep = Math.ceil(maxDataValue / 4);
+  // Calculate the progress as a percentage of the goal
+  const progress = balance / goal;
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+     <View style={[styles.Headercontainer, { backgroundColor: colors.primary }]}>
       <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={[styles.creditScore, { color: colors.onPrimary }]}>Credit Score</Text>
-          <Text style={[styles.scoreValue, { color: colors.onPrimary }]}>781</Text>
-        </View>
         <IconButton
           icon="bell-outline"
           size={24}
@@ -92,55 +74,25 @@ const DashboardScreen = () => {
       </View>
 
       <View style={styles.balanceSection}>
-        <Text style={[styles.balance, { color: colors.primary }]}>${balance.toLocaleString()}</Text>
-        <Text style={[styles.subtitle, { color: colors.onSurface }]}>
+        <Text style={[styles.balance, { color: colors.background }]}>${balance.toLocaleString()}</Text>
+        <Text style={[styles.subtitle, { color: colors.background }]}>
           {`$${balance.toLocaleString()} / Goal: $${goal.toLocaleString()}`}
         </Text>
-        <View style={[styles.graphPlaceholder, { backgroundColor: colors.surface }]}>
-          <LineChart
-            data={data}
-            width={screenWidth - 32}
-            height={240}
-            yAxisLabel="£"
-            yAxisInterval={1}
-            chartConfig={{
-              backgroundColor: colors.background,
-              backgroundGradientFrom: colors.background,
-              backgroundGradientTo: colors.background,
-              decimalPlaces: 2,
-              color: (opacity = 1) => colors.primary,
-              labelColor: (opacity = 1) => colors.onSurface,
-              style: { borderRadius: 16 },
-              propsForBackgroundLines: { strokeWidth: 0 },
-              propsForDots: { r: '0' },
-              propsForVerticalLabels: { fontSize: 10, fontFamily: 'Roboto', fill: colors.onSurface },
-            }}
-            bezier
-            style={styles.chart}
-          />
-          <Svg height="240" width={screenWidth - 32} style={StyleSheet.absoluteFillObject}>
-            <Line
-              x1="0"
-              y1={240 - (goal / maxDataValue) * 240}
-              x2={screenWidth - 32}
-              y2={240 - (goal / maxDataValue) * 240}
-              stroke="grey"
-              strokeWidth="2"
-              strokeDasharray="5, 5"
-            />
-          </Svg>
-        </View>
+        <ProgressBar progress={progress} color={colors.secondary} style={styles.progressBar} />
+        <Text style={[styles.progressLabel, { color: colors.background }]}>
+          {Math.round(progress * 100)}% of your goal
+        </Text>
       </View>
 
       <View style={styles.actionButtons}>
-        <Button mode="contained" style={[styles.button, { backgroundColor: colors.primary }]} onPress={() => setModalVisible(true)}>
+        <Button mode="contained" style={[styles.button, { backgroundColor: colors.secondary }]} onPress={() => setModalVisible(true)}>
           Track Transaction
         </Button>
-        <Button mode="contained" style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleAddGoal}>
+        <Button mode="contained" style={[styles.button, { backgroundColor: colors.secondary }]} onPress={handleAddGoal}>
           Set Goal
         </Button>
       </View>
-
+     </View>
       <Divider style={styles.divider} />
 
       <View style={styles.categoriesAndExpenses}>
@@ -209,14 +161,27 @@ const DashboardScreen = () => {
               onChangeText={setReference}
             />
             <View style={styles.buttonGroup}>
-              <TouchableOpacity style={[styles.button, { backgroundColor: colors.error }]} onPress={() => { setExpenseType('expense'); handleTrackTransaction(); }}>
-                <Text style={styles.buttonText}>Track Expense</Text>
+            <TouchableOpacity
+                style={[
+                  styles.typeButton,
+                  expenseType === 'expense' && { backgroundColor: colors.accent },
+                ]}
+                onPress={() => setExpenseType('expense')}
+              >
+                <Text style={styles.buttonText}>Expense</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={() => { setExpenseType('income'); handleTrackTransaction(); }}>
-                <Text style={styles.buttonText}>Track Income</Text>
+              <TouchableOpacity
+                style={[
+                  styles.typeButton,
+                  expenseType === 'income' && { backgroundColor: colors.primary },
+                ]}
+                onPress={() => setExpenseType('income')}
+              >
+                <Text style={styles.buttonText}>Income</Text>
               </TouchableOpacity>
-              <Button mode="contained" onPress={() => setModalVisible(false)}>Cancel</Button>
             </View>
+            <Button mode="contained" onPress={handleTrackTransaction} style={{ marginTop: 10 }}>OK</Button>
+            <Button mode="contained" onPress={() => setModalVisible(false)} style={{ marginTop: 10 }}>Cancel</Button>
           </View>
         </View>
       </Modal>
@@ -227,7 +192,7 @@ const DashboardScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 0,
   },
   header: {
     flexDirection: 'row',
@@ -262,74 +227,79 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 4,
   },
-  graphPlaceholder: {
-    borderRadius: 16,
-    padding: 8,
-    overflow: 'hidden',
+  progressBar: {
+    marginVertical: 12,
+    height: 10,
+    borderRadius: 5,
   },
-  chart: {
-    marginVertical: 8,
-    borderRadius: 16,
+  progressLabel: {
+    fontSize: 14,
+    textAlign: 'center',
   },
   actionButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 16,
   },
-  button: {
+  typeButton: {
     flex: 1,
-    marginHorizontal: 8,
+    padding: 10,
+    alignItems: 'center',
+    marginHorizontal: 4,
+    borderRadius: 5,
+    backgroundColor: '#ddd',
   },
   divider: {
     marginVertical: 16,
   },
   categoriesAndExpenses: {
-    marginTop: 16,
+    marginBottom: 16,
   },
   categoryCard: {
-    marginBottom: 8,
-    borderRadius: 8,
+    marginVertical: 4,
   },
   categoryLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 14,
   },
   categoryValue: {
     fontSize: 18,
+    fontWeight: 'bold',
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
     backgroundColor: 'white',
+    marginHorizontal: 20,
     padding: 20,
-    borderRadius: 10,
-    width: '80%',
-    maxWidth: 400,
+    borderRadius: 8,
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
     marginBottom: 12,
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
     borderBottomWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
+    borderBottomColor: '#ccc',
+    marginBottom: 16,
+    padding: 8,
   },
   buttonGroup: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 12,
+    marginBottom: 16,
   },
   buttonText: {
-    color: 'white',
+    color: '#fff',
+    textAlign: 'center',
+  },
+  Headercontainer: {
+      width: 'windowWidth',
+      padding: 16,
   },
 });
 
 export default DashboardScreen;
+ 
