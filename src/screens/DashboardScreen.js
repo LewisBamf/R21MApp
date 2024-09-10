@@ -63,15 +63,6 @@ const DashboardScreen = () => {
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
      <View style={[styles.Headercontainer, { backgroundColor: colors.primary }]}>
-      <View style={styles.header}>
-        <IconButton
-          icon="bell-outline"
-          size={24}
-          iconColor={colors.onPrimary}
-          style={styles.notificationIcon}
-          onPress={() => {}}
-        />
-      </View>
 
       <View style={styles.balanceSection}>
         <Text style={[styles.balance, { color: colors.background }]}>${balance.toLocaleString()}</Text>
@@ -220,8 +211,9 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   balance: {
-    fontSize: 36,
+    fontSize: 42,
     fontWeight: 'bold',
+    marginTop: 32,
   },
   subtitle: {
     fontSize: 16,
