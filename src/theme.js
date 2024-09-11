@@ -32,5 +32,5 @@ export const simpleMoneyDarkTheme = {
         placeholder: 'rgb(117, 117, 117)',
         backdrop: 'rgb(0, 0, 0, 0.5)',
         notification: 'rgb(255, 87, 34)',
-    },
+      },
 };

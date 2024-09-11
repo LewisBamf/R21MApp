@@ -2,6 +2,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import { Provider as PaperProvider, useTheme, IconButton } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { simpleMoneyLightTheme, simpleMoneyDarkTheme } from './src/theme';
@@ -9,9 +10,10 @@ import { PreferencesContext } from './src/context/PreferencesContext';
 import DashboardScreen from './src/screens/DashboardScreen';
 import TutorialsScreen from './src/screens/TutorialsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
-import Header from './src/components/Header';
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 function TabBarIcon({ routeName, focused }) {
   const { colors } = useTheme();
@@ -25,6 +27,40 @@ function TabBarIcon({ routeName, focused }) {
   }
 
   return <Icon name={iconName} size={24} color={iconColor} />;
+}
+
+function MainTabs() {
+  const navigation = useNavigation(); // Use navigation from the hook
+  const { colors } = useTheme();
+
+  const handleProfilePress = () => {
+    navigation.navigate('Profile'); // Properly navigate to the Profile screen
+  };
+
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused }) => <TabBarIcon routeName={route.name} focused={focused} />,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.placeholder,
+        tabBarStyle: {
+          backgroundColor: colors.background,
+        },
+        headerRight: () => (
+          <IconButton
+            icon="account-circle"
+            color={colors.primary}
+            size={32}
+            onPress={handleProfilePress}
+            style={{ zIndex: 1 }} // Ensures the button remains above other elements
+          />
+        ),
+      })}
+    >
+      <Tab.Screen name="Dashboard" component={DashboardScreen} />
+      <Tab.Screen name="Tutorials" component={TutorialsScreen} />
+    </Tab.Navigator>
+  );
 }
 
 export default function App() {
@@ -43,41 +79,30 @@ export default function App() {
     [toggleTheme, isThemeDark]
   );
 
-  const handleProfilePress = () => {
-    // Handle profile button press (e.g., navigate to profile screen)
-    const handleProfilePress = () => {
-      // Handle profile button press (e.g., navigate to profile screen)
-      navigation.navigate('Profile', { screen: 'ProfileScreen' });
-    };
-  };
-
   return (
-    <PreferencesContext.Provider value={preferences} theme={theme}>
+    <PreferencesContext.Provider value={preferences}>
       <PaperProvider theme={theme}>
         <NavigationContainer theme={theme}>
-          <Tab.Navigator
-            screenOptions={({ route }) => ({
-              tabBarIcon: ({ focused }) => (
-                <TabBarIcon routeName={route.name} focused={focused} />
-              ),
-              tabBarActiveTintColor: theme.colors.primary,
-              tabBarInactiveTintColor: theme.colors.placeholder,
-              tabBarStyle: {
-                backgroundColor: theme.colors.background,
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false, // Hide headers in stack to manage with z-index
+              gestureEnabled: true,
+              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+              cardStyle: {
+                zIndex: 0, // Lower the zIndex of the Profile screen to avoid overlapping
+                elevation: 0, // For Android, manage elevation to keep correct layering
               },
-              headerRight: () => (
-                <IconButton
-                  icon="account-circle"
-                  color={theme.colors.primary}
-                  size={32}
-                  onPress={handleProfilePress}
-                />
-              ),
-            })}
+            }}
           >
-            <Tab.Screen name="Dashboard" component={DashboardScreen} />
-            <Tab.Screen name="Tutorials" component={TutorialsScreen} />
-          </Tab.Navigator>
+            <Stack.Screen name="MainTabs" component={MainTabs} />
+            <Stack.Screen
+              name="Profile"
+              component={ProfileScreen}
+              options={{
+                headerShown: true, // Show Profile header but manage zIndex
+              }}
+            />
+          </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>
     </PreferencesContext.Provider>
