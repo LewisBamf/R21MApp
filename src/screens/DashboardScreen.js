@@ -60,99 +60,98 @@ const DashboardScreen = () => {
   // Calculate the progress as a percentage of the goal
   const progress = balance / goal;
 
-  return (
+return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
      <View style={[styles.Headercontainer, { backgroundColor: colors.primary }]}>
 
-      <View style={styles.balanceSection}>
-        <Text style={[styles.balance, { color: colors.background }]}>${balance.toLocaleString()}</Text>
-        <Text style={[styles.subtitle, { color: colors.background }]}>
-          {`$${balance.toLocaleString()} / Goal: $${goal.toLocaleString()}`}
-        </Text>
-        <ProgressBar progress={progress} color={colors.secondary} style={styles.progressBar} />
-        <Text style={[styles.progressLabel, { color: colors.background }]}>
-          {Math.round(progress * 100)}% of your goal
-        </Text>
-      </View>
-
-      <View style={styles.actionButtons}>
-        <Button mode="contained" style={[styles.button, { backgroundColor: colors.secondary }]} onPress={() => setModalVisible(true)}>
-          Track Transaction
-        </Button>
-        <Button mode="contained" style={[styles.button, { backgroundColor: colors.secondary }]} onPress={handleAddGoal}>
-          Set Goal
-        </Button>
-      </View>
-     </View>
-      <Divider style={styles.divider} />
-
-      <View style={styles.categoriesAndExpenses}>
-
-        {/* Dynamic Expense List */}
-        {expenses.map((expense, index) => (
-          <Card key={index} style={styles.categoryCard}>
-            <Card.Content>
-              <Text style={styles.categoryLabel}>{expense.reference || 'No Reference'}</Text>
-              <Text style={[styles.categoryValue, { color: expense.type === 'expense' ? colors.error : colors.primary }]}>
-                {`${expense.type === 'expense' ? '-' : '+'} $${expense.amount.toFixed(2)}`}
-              </Text>
-              <Text style={[styles.categoryValue, { color: colors.onSurface }]}>
-                {moment(expense.date).format('MMM DD, YYYY')}
-              </Text>
-            </Card.Content>
-          </Card>
-        ))}
-      </View>
-
-      <Modal
-        transparent={true}
-        animationType="slide"
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add Transaction</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Amount"
-              keyboardType="numeric"
-              value={amount}
-              onChangeText={setAmount}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Reference (optional)"
-              value={reference}
-              onChangeText={setReference}
-            />
-            <View style={styles.buttonGroup}>
-            <TouchableOpacity
-                style={[
-                  styles.typeButton,
-                  expenseType === 'expense' && { backgroundColor: colors.primary },
-                ]}
-                onPress={() => setExpenseType('expense')}
-              >
-                <Text style={styles.buttonText}>Expense</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.typeButton,
-                  expenseType === 'income' && { backgroundColor: colors.primary },
-                ]}
-                onPress={() => setExpenseType('income')}
-              >
-                <Text style={styles.buttonText}>Income</Text>
-              </TouchableOpacity>
-            </View>
-            <Button mode="contained" onPress={handleTrackTransaction} style={{ marginTop: 10 }}>OK</Button>
-            <Button mode="contained" onPress={() => setModalVisible(false)} style={{ marginTop: 10, backgroundColor: colors.error }}>Cancel</Button>
-          </View>
+        <View style={styles.balanceSection}>
+            <Text style={[styles.balance, { color: colors.background }]}>${balance.toLocaleString()}</Text>
+            <Text style={[styles.subtitle, { color: colors.background }]}>
+                {`$${balance.toLocaleString()} / Goal: $${goal.toLocaleString()}`}
+            </Text>
+            <ProgressBar progress={progress} color={colors.secondary} style={styles.progressBar} />
+            <Text style={[styles.progressLabel, { color: colors.background }]}>
+                {Math.round(progress * 100)}% of your goal
+            </Text>
         </View>
-      </Modal>
+
+        <View style={styles.actionButtons}>
+            <Button mode="contained" style={[styles.button, { backgroundColor: colors.secondary, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 3 }]} onPress={() => setModalVisible(true)}>
+                Track Transaction
+            </Button>
+            <Button mode="contained" style={[styles.button, { backgroundColor: colors.secondary, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 3 }]} onPress={handleAddGoal}>
+                Set Goal
+            </Button>
+        </View>
+     </View>
+
+        <View style={[styles.categoriesAndExpenses, { backgroundColor: colors.secondary }]}>
+
+            {/* Dynamic Expense List */}
+            {expenses.map((expense, index) => (
+                <Card key={index} style={styles.categoryCard}>
+                    <Card.Content>
+                        <Text style={styles.categoryLabel}>{expense.reference || 'No Reference'}</Text>
+                        <Text style={[styles.categoryValue, { color: expense.type === 'expense' ? colors.error : colors.primary }]}>
+                            {`${expense.type === 'expense' ? '-' : '+'} $${expense.amount.toFixed(2)}`}
+                        </Text>
+                        <Text style={[styles.categoryValue, { color: colors.onSurface }]}>
+                            {moment(expense.date).format('MMM DD, YYYY')}
+                        </Text>
+                    </Card.Content>
+                </Card>
+            ))}
+        </View>
+
+        <Modal
+            transparent={true}
+            animationType="slide"
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
+        >
+            <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                    <Text style={styles.modalTitle}>Add Transaction</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Amount"
+                        keyboardType="numeric"
+                        value={amount}
+                        onChangeText={setAmount}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Reference (optional)"
+                        value={reference}
+                        onChangeText={setReference}
+                    />
+                    <View style={styles.buttonGroup}>
+                    <TouchableOpacity
+                            style={[
+                                styles.typeButton,
+                                expenseType === 'expense' && { backgroundColor: colors.notification },
+                            ]}
+                            onPress={() => setExpenseType('expense')}
+                        >
+                            <Text style={styles.buttonText}>-</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[
+                                styles.typeButton,
+                                expenseType === 'income' && { backgroundColor: colors.primary },
+                            ]}
+                            onPress={() => setExpenseType('income')}
+                        >
+                            <Text style={styles.buttonText}>+</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <Button mode="contained" onPress={handleTrackTransaction} style={[styles.button, { marginTop: 10, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 3 }]}>OK</Button>
+                    <Button mode="contained" onPress={() => setModalVisible(false)} style={[styles.button, { marginTop: 10, backgroundColor: colors.error, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 3 }]}>Cancel</Button>
+                </View>
+            </View>
+        </Modal>
     </ScrollView>
-  );
+);
 };
 
 const styles = StyleSheet.create({
@@ -186,7 +185,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   balance: {
-    fontSize: 42,
+    fontSize: 52,
     fontWeight: 'bold',
     marginTop: 32,
   },
@@ -210,7 +209,7 @@ const styles = StyleSheet.create({
   },
   typeButton: {
     flex: 1,
-    padding: 10,
+    padding: 0,
     alignItems: 'center',
     marginHorizontal: 4,
     borderRadius: 5,
@@ -221,9 +220,11 @@ const styles = StyleSheet.create({
   },
   categoriesAndExpenses: {
     marginBottom: 16,
+    height: '75%',
   },
   categoryCard: {
     marginVertical: 4,
+    margin: 16,
   },
   categoryLabel: {
     fontSize: 14,
@@ -261,6 +262,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     textAlign: 'center',
+    fontSize: 32,
   },
   Headercontainer: {
       width: 'windowWidth',

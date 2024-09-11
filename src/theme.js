@@ -7,7 +7,7 @@ export const simpleMoneyLightTheme = {
     ...MD3LightTheme,
     colors: {
         ...MD3LightTheme.colors,
-        primary: 'rgb(68, 160, 111)',
+        primary: 'rgb(87, 189, 134)',
         secondary: 'rgb(140, 199, 171)',
         accent: 'rgb(230, 216, 185)',
         background: 'rgb(251, 251, 251)',

@@ -2,12 +2,13 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Provider as PaperProvider, useTheme } from 'react-native-paper';
+import { Provider as PaperProvider, useTheme, IconButton } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { simpleMoneyLightTheme, simpleMoneyDarkTheme } from './src/theme';
 import { PreferencesContext } from './src/context/PreferencesContext';
 import DashboardScreen from './src/screens/DashboardScreen';
 import TutorialsScreen from './src/screens/TutorialsScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 import Header from './src/components/Header';
 
 const Tab = createBottomTabNavigator();
@@ -42,26 +43,20 @@ export default function App() {
     [toggleTheme, isThemeDark]
   );
 
-  const handleMenuPress = () => {
-    // Handle menu button press (e.g., open drawer or show modal)
-    console.log('Menu button pressed');
-  };
-
   const handleProfilePress = () => {
     // Handle profile button press (e.g., navigate to profile screen)
-    console.log('Profile button pressed');
+    const handleProfilePress = () => {
+      // Handle profile button press (e.g., navigate to profile screen)
+      navigation.navigate('Profile', { screen: 'ProfileScreen' });
+    };
   };
 
   return (
     <PreferencesContext.Provider value={preferences} theme={theme}>
       <PaperProvider theme={theme}>
         <NavigationContainer theme={theme}>
-          {/* Add the Header component */}
-          <Header onMenuPress={handleMenuPress} onProfilePress={handleProfilePress} />
-
           <Tab.Navigator
             screenOptions={({ route }) => ({
-              headerShown: false,
               tabBarIcon: ({ focused }) => (
                 <TabBarIcon routeName={route.name} focused={focused} />
               ),
@@ -70,6 +65,14 @@ export default function App() {
               tabBarStyle: {
                 backgroundColor: theme.colors.background,
               },
+              headerRight: () => (
+                <IconButton
+                  icon="account-circle"
+                  color={theme.colors.primary}
+                  size={32}
+                  onPress={handleProfilePress}
+                />
+              ),
             })}
           >
             <Tab.Screen name="Dashboard" component={DashboardScreen} />
